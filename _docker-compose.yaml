@@ -1,0 +1,40 @@
+services:
+  db:
+    container_name: postgres_db
+    image: postgres:alpine
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    volumes: 
+      - db:/var/lib/postgresql/data
+        
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+    ports:
+      - 5050:80
+    depends_on:
+      - db
+  
+  app:
+    container_name: app
+    build: 
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - .:/Users/toddnoel/projects/cookbook/app
+    depends_on:
+      - db
+    restart: always
+    
+volumes:
+  db:
+    driver: local
